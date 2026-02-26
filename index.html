@@ -321,6 +321,14 @@
 
   .btn-restart:hover { border-color: #444; color: var(--text); }
 
+  .logo-card {
+    display: block;
+    width: 90px;
+    opacity: 0.85;
+    margin-top: 24px;
+    margin-left: auto;
+  }
+
   @media (max-width: 480px) {
     .card { padding: 36px 24px; }
     h1 { font-size: 56px; }
@@ -340,6 +348,7 @@
       <div class="divider"></div>
       <p class="subtitle">Descubra os produtos certos para o seu tipo de pele e eleve seu nível. Sem achismo, só resultado.</p>
       <button class="btn-primary" onclick="showScreen('screen-question')">Iniciar →</button>
+      <img src="Logo.png" alt="Davius Improvement" class="logo-card">
     </div>
   </div>
 
@@ -380,6 +389,7 @@
         </button>
       </div>
       <button class="btn-next" id="btn-next" onclick="showResult()">Ver protocolo →</button>
+      <img src="Logo.png" alt="Davius Improvement" class="logo-card">
     </div>
   </div>
 
@@ -480,6 +490,7 @@
       <div class="products-label">Produtos Recomendados</div>
       <div class="products-grid">${productsHTML}</div>
       <button class="btn-restart" onclick="restart()">← Refazer</button>
+      <img src="Logo.png" alt="Davius Improvement" class="logo-card">
     `;
 
     showScreen('screen-result');
