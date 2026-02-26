@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skin Quiz — Lookmaxxing</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --accent: #c8f542;
+    --text: #e8e8e8;
+    --muted: #666666;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background:
+      radial-gradient(ellipse at 80% 10%, rgba(200,245,66,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 10% 90%, rgba(200,245,66,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 540px;
+  }
+
+  .screen { display: none; animation: fadeUp 0.5s ease forwards; }
+  .screen.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 52px 48px;
+  }
+
+  .tag {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    line-height: 0.95;
+    color: var(--white);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+  }
+
+  h1 .accent { color: var(--accent); }
+
+  .divider {
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+    margin-bottom: 40px;
+    max-width: 380px;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 16px 40px;
+    border-radius: 2px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover { background: var(--white); transform: translateY(-2px); }
+
+  .step-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  .question-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--white);
+    letter-spacing: 1px;
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+
+  .question-sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 36px;
+  }
+
+  .options { display: grid; gap: 8px; }
+
+  .option {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 18px 22px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .option:hover { border-color: #444; background: #161616; }
+  .option.selected { border-color: var(--accent); background: rgba(200,245,66,0.05); }
+
+  .option-indicator {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .option.selected .option-indicator {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .option.selected .option-indicator::after {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--bg);
+    border-radius: 50%;
+  }
+
+  .option-text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .option-text span { font-size: 12px; color: var(--muted); font-weight: 300; }
+
+  .btn-next {
+    margin-top: 28px;
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 16px 40px;
+    border-radius: 2px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.2;
+    pointer-events: none;
+  }
+
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { background: var(--white); transform: translateY(-2px); }
+
+  .result-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+
+  .result-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 60px;
+    color: var(--white);
+    letter-spacing: 2px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .result-title .accent { color: var(--accent); }
+
+  .result-desc {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.7;
+    margin-bottom: 36px;
+    margin-top: 16px;
+  }
+
+  .products-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .products-grid { display: grid; gap: 8px; margin-bottom: 32px; }
+
+  .product-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px 20px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    color: var(--text);
+  }
+
+  .product-link:hover {
+    border-color: var(--accent);
+    background: rgba(200,245,66,0.04);
+    color: var(--white);
+  }
+
+  .product-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--accent);
+    width: 28px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .product-name { font-size: 13px; font-weight: 500; letter-spacing: 0.5px; flex: 1; }
+
+  .product-arrow {
+    color: var(--accent);
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .product-link:hover .product-arrow { opacity: 1; }
+
+  .btn-restart {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 13px 32px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-restart:hover { border-color: #444; color: var(--text); }
+
+  @media (max-width: 480px) {
+    .card { padding: 36px 24px; }
+    h1 { font-size: 56px; }
+    .question-label { font-size: 38px; }
+    .result-title { font-size: 46px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- INTRO -->
+  <div class="screen active" id="screen-intro">
+    <div class="card">
+      <div class="tag">Davius Improvement</div>
+      <h1>SKIN<br><span class="accent">PROTOCOL</span></h1>
+      <div class="divider"></div>
+      <p class="subtitle">Descubra os produtos certos para o seu tipo de pele e eleve seu nível. Sem achismo, só resultado.</p>
+      <button class="btn-primary" onclick="showScreen('screen-question')">Iniciar →</button>
+    </div>
+  </div>
+
+  <!-- PERGUNTA -->
+  <div class="screen" id="screen-question">
+    <div class="card">
+      <div class="step-label">Diagnóstico</div>
+      <div class="question-label">COMO É<br>SUA PELE?</div>
+      <p class="question-sub">Escolha a opção que melhor te descreve</p>
+      <div class="options">
+        <button class="option" onclick="selectOption(this, 'seca')">
+          <div class="option-indicator"></div>
+          <div class="option-text">
+            <strong>Pele Seca</strong>
+            <span>Sensação de tensão, descamação e pouca oleosidade</span>
+          </div>
+        </button>
+        <button class="option" onclick="selectOption(this, 'oleosa')">
+          <div class="option-indicator"></div>
+          <div class="option-text">
+            <strong>Pele Oleosa</strong>
+            <span>Brilho excessivo, poros dilatados e cravos frequentes</span>
+          </div>
+        </button>
+        <button class="option" onclick="selectOption(this, 'mista')">
+          <div class="option-indicator"></div>
+          <div class="option-text">
+            <strong>Pele Mista</strong>
+            <span>Oleosa na zona T e seca ou normal nas bochechas</span>
+          </div>
+        </button>
+        <button class="option" onclick="selectOption(this, 'sensivel')">
+          <div class="option-indicator"></div>
+          <div class="option-text">
+            <strong>Pele Sensível</strong>
+            <span>Reage facilmente, vermelhidão e irritação com frequência</span>
+          </div>
+        </button>
+      </div>
+      <button class="btn-next" id="btn-next" onclick="showResult()">Ver protocolo →</button>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="screen" id="screen-result">
+    <div class="card" id="result-card"></div>
+  </div>
+
+</div>
+
+<p style="text-align:center; font-size:10px; color:#333; font-family:'Barlow',sans-serif; font-weight:300; margin-top:20px; line-height:1.6; max-width:400px; margin-left:auto; margin-right:auto;">
+  * Estas são apenas recomendações. Em caso de necessidade, procure um dermatologista.
+</p>
+
+<script>
+  let selectedType = null;
+
+  const results = {
+    seca: {
+      title: 'PELE',
+      titleAccent: 'SECA',
+      desc: 'Sua pele precisa de hidratação intensa e ingredientes que restaurem a barreira cutânea. Esses são os produtos do seu protocolo:',
+      products: [
+        { name: 'Produto 1 — Pele Seca', url: 'https://seulink.com/produto1-seca' },
+        { name: 'Produto 2 — Pele Seca', url: 'https://seulink.com/produto2-seca' },
+        { name: 'Produto 3 — Pele Seca', url: 'https://seulink.com/produto3-seca' },
+        { name: 'Produto 4 — Pele Seca', url: 'https://seulink.com/produto4-seca' },
+      ]
+    },
+    oleosa: {
+      title: 'PELE',
+      titleAccent: 'OLEOSA',
+      desc: 'Sua pele precisa de produtos que controlem o brilho e equilibrem a produção de sebo sem ressecar. Seu protocolo:',
+      products: [
+        { name: 'Produto 1 — Pele Oleosa', url: 'https://seulink.com/produto1-oleosa' },
+        { name: 'Produto 2 — Pele Oleosa', url: 'https://seulink.com/produto2-oleosa' },
+        { name: 'Produto 3 — Pele Oleosa', url: 'https://seulink.com/produto3-oleosa' },
+        { name: 'Produto 4 — Pele Oleosa', url: 'https://seulink.com/produto4-oleosa' },
+      ]
+    },
+    mista: {
+      title: 'PELE',
+      titleAccent: 'MISTA',
+      desc: 'Sua pele exige equilíbrio: controle na zona T e nutrição nas áreas mais secas. Esses são os produtos do seu protocolo:',
+      products: [
+        { name: 'Produto 1 — Pele Mista', url: 'https://seulink.com/produto1-mista' },
+        { name: 'Produto 2 — Pele Mista', url: 'https://seulink.com/produto2-mista' },
+        { name: 'Produto 3 — Pele Mista', url: 'https://seulink.com/produto3-mista' },
+        { name: 'Produto 4 — Pele Mista', url: 'https://seulink.com/produto4-mista' },
+      ]
+    },
+    sensivel: {
+      title: 'PELE',
+      titleAccent: 'SENSÍVEL',
+      desc: 'Sua pele exige formulações suaves e ingredientes calmantes. Sem agressão, máximo resultado. Seu protocolo:',
+      products: [
+        { name: 'Produto 1 — Pele Sensível', url: 'https://seulink.com/produto1-sensivel' },
+        { name: 'Produto 2 — Pele Sensível', url: 'https://seulink.com/produto2-sensivel' },
+        { name: 'Produto 3 — Pele Sensível', url: 'https://seulink.com/produto3-sensivel' },
+        { name: 'Produto 4 — Pele Sensível', url: 'https://seulink.com/produto4-sensivel' },
+      ]
+    }
+  };
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(id);
+    el.classList.add('active');
+    el.style.animation = 'none';
+    el.offsetHeight;
+    el.style.animation = '';
+  }
+
+  function selectOption(el, type) {
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedType = type;
+    document.getElementById('btn-next').classList.add('ready');
+  }
+
+  function showResult() {
+    if (!selectedType) return;
+    const r = results[selectedType];
+    const card = document.getElementById('result-card');
+
+    const productsHTML = r.products.map((p, i) => `
+      <a href="${p.url}" target="_blank" class="product-link">
+        <div class="product-num">0${i + 1}</div>
+        <span class="product-name">${p.name}</span>
+        <span class="product-arrow">→</span>
+      </a>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="result-tag">Seu Protocolo</div>
+      <div class="result-title">${r.title}<br><span class="accent">${r.titleAccent}</span></div>
+      <p class="result-desc">${r.desc}</p>
+      <div class="products-label">Produtos Recomendados</div>
+      <div class="products-grid">${productsHTML}</div>
+      <button class="btn-restart" onclick="restart()">← Refazer</button>
+    `;
+
+    showScreen('screen-result');
+  }
+
+  function restart() {
+    selectedType = null;
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    document.getElementById('btn-next').classList.remove('ready');
+    showScreen('screen-intro');
+  }
+</script>
+</body>
+</html>
